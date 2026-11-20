@@ -1,0 +1,14 @@
+@import "tailwindcss";
+@theme inline {
+  --font-sans: var(--font-sans);
+  --font-condensed: var(--font-condensed);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  margin: 0;
+}
