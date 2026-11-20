@@ -4,9 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
-import { getMembers, type Member } from "../lib/members";
+import {
+  getMembers,
+  type Member,
+  type PreferredPosition,
+} from "../lib/members";
 
 const pageSize = 10;
+const positions: PreferredPosition[] = [
+  "Goalkeeper",
+  "Defender",
+  "Midfielder",
+  "Forward",
+];
 
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([]);
@@ -14,6 +24,7 @@ export default function MembersPage() {
   const [page, setPage] = useState(0);
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
+  const [positionFilter, setPositionFilter] = useState<PreferredPosition | "">("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -21,7 +32,12 @@ export default function MembersPage() {
   useEffect(() => {
     const controller = new AbortController();
     getMembers(
-      { skip: page * pageSize, limit: pageSize, search: search || undefined },
+      {
+        skip: page * pageSize,
+        limit: pageSize,
+        search: search || undefined,
+        preferred_position: positionFilter || undefined,
+      },
       controller.signal,
     )
       .then((response) => {
@@ -37,7 +53,7 @@ export default function MembersPage() {
         if (!controller.signal.aborted) setIsLoading(false);
       });
     return () => controller.abort();
-  }, [page, reloadKey, search]);
+  }, [page, positionFilter, reloadKey, search]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -76,7 +92,10 @@ export default function MembersPage() {
           </h1>
           <div className="sm:text-right">
             <p className="text-sm leading-6 text-slate-500">
-              {total.toLocaleString()} registered {total === 1 ? "member" : "members"}
+              {total.toLocaleString()}{" "}
+              {positionFilter || search
+                ? `matching ${total === 1 ? "member" : "members"}`
+                : `registered ${total === 1 ? "member" : "members"}`}
             </p>
             <Link
               href="/join"
@@ -92,7 +111,7 @@ export default function MembersPage() {
             {total.toLocaleString()}
           </strong>
           <span className="mt-2 block text-[10px] font-bold tracking-wider">
-            TOTAL REGISTERED MEMBERS
+            {positionFilter || search ? "MEMBERS MATCHING FILTERS" : "TOTAL REGISTERED MEMBERS"}
           </span>
         </section>
 
@@ -100,14 +119,39 @@ export default function MembersPage() {
           <div
             className="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between"
           >
-            <input
-              type="search"
-              aria-label="Search members"
-              value={searchInput}
-              onChange={(event) => setSearchInput(event.target.value)}
-              placeholder="Search by member name or ID"
-              className="border border-slate-200 px-3 py-3 text-sm outline-none focus:border-[#075aa6] sm:w-80"
-            />
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                type="search"
+                aria-label="Search members"
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                placeholder="Search by member name or ID"
+                className="border border-slate-200 px-3 py-3 text-sm outline-none focus:border-[#075aa6] sm:w-80"
+              />
+              <select
+                aria-label="Filter members by position"
+                value={positionFilter}
+                onChange={(event) => {
+                  const value = event.currentTarget.value;
+                  const selectedPosition = positions.find(
+                    (position) => position === value,
+                  );
+                  if (value !== "" && !selectedPosition) return;
+                  setPositionFilter(selectedPosition ?? "");
+                  setPage(0);
+                  setIsLoading(true);
+                  setError(null);
+                }}
+                className="border border-slate-200 bg-white px-3 py-3 text-sm outline-none focus:border-[#075aa6]"
+              >
+                <option value="">All positions</option>
+                {positions.map((position) => (
+                  <option key={position} value={position}>
+                    {position}
+                  </option>
+                ))}
+              </select>
+            </div>
             <Link
               href="/admin/members"
               className="w-fit border border-slate-200 px-4 py-3 text-xs font-extrabold text-[#075aa6]"
@@ -133,7 +177,9 @@ export default function MembersPage() {
             </p>
           ) : members.length === 0 ? (
             <p className="p-8 text-center text-sm text-slate-500">
-              {search ? "No members match your search." : "No members have been added yet."}
+              {search || positionFilter
+                ? "No members match your filters."
+                : "No members have been added yet."}
             </p>
           ) : (
             <>

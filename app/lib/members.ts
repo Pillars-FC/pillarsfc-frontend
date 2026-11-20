@@ -51,7 +51,12 @@ interface MemberDetailResponse {
 }
 
 export async function getMembers(
-  params: { skip: number; limit: number; search?: string },
+  params: {
+    skip: number;
+    limit: number;
+    search?: string;
+    preferred_position?: PreferredPosition;
+  },
   signal?: AbortSignal,
 ): Promise<MembersResponse> {
   const response = await api.get<MembersResponse>("/members", { params, signal });
