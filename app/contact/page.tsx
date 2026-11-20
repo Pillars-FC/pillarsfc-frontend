@@ -24,21 +24,24 @@ export default function ContactPage() {
                 label="VISIT US"
                 detail={
                   <>
-                    Sani Abacha Stadium
+                    Unity Park, Udoudoma Avenue
                     <br />
-                    Kano, Nigeria
+                    Opposite Central Bank of Nigeria,
+                    <br />
+                    Uyo, Akwa Ibom State
                   </>
                 }
               />
-              <ContactItem label="CALL US" detail="+234 (0) 800 000 0000" />
+              <ContactItem label="CALL US" detail="+234 (0) 706 183 2387, +234 (0) 703 182 5057" />
+              {/* <ContactItem label="CALL US" detail="+234 (0) 703 182 5057" /> */}
               <ContactItem label="EMAIL US" detail="hello@pillarsfc.ng" />
               <ContactItem
-                label="OFFICE HOURS"
+                label="TRAINING HOURS"
                 detail={
                   <>
-                    Monday – Friday
+                    Saturday
                     <br />
-                    9:00 AM – 5:00 PM WAT
+                    7:30 AM – 11:00 AM WAT
                   </>
                 }
               />
