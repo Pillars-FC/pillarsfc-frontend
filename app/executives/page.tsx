@@ -89,17 +89,22 @@ export default function ExecutivesPage() {
                   aria-label={executive.name}
                   className={`grid h-56 place-items-center bg-cover bg-center ${cardColors[index % cardColors.length]}`}
                   style={{
-                    backgroundImage: `linear-gradient(0deg, rgba(7, 27, 51, .5), rgba(7, 27, 51, .1)), url("${executive.image}")`,
+                    backgroundImage: executive.image
+                      ? `linear-gradient(0deg, rgba(7, 27, 51, .5), rgba(7, 27, 51, .1)), url("${executive.image}")`
+                      : undefined,
+                    backgroundPosition: executive.image ? "center top" : undefined,
                   }}
                 >
-                  <span className="font-condensed text-8xl font-black text-white/90 drop-shadow">
-                    {executive.name
-                      .split(/\s+/)
-                      .map((part) => part[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toUpperCase()}
-                  </span>
+                  {!executive.image && (
+                    <span className="font-condensed text-8xl font-black text-white/90 drop-shadow">
+                      {executive.name
+                        .split(/\s+/)
+                        .map((part) => part[0])
+                        .join("")
+                        .slice(0, 2)
+                        .toUpperCase()}
+                    </span>
+                  )}
                 </div>
                 <div className="p-6">
                   <p className="text-[10px] font-extrabold tracking-[.14em] text-[#075aa6]">
