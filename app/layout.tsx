@@ -11,6 +11,9 @@ const condensed = Barlow_Condensed({
 const sans = DM_Sans({ variable: "--font-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://pillarsfc.vercel.app",
+  ),
   title: "Pillars Football Club",
   description: "The official home of Pillars Football Club.",
 };
