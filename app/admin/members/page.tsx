@@ -2,13 +2,14 @@
 
 import axios from "axios";
 import Link from "next/link";
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import Navbar from "../../components/Navbar";
 import { getAdminSession, loginAdmin, logoutAdmin } from "../../lib/admin";
 import {
   createMember,
   type PreferredPosition,
 } from "../../lib/members";
+import AdminMemberManager from "./AdminMemberManager";
 
 export default function AdminMembersPage() {
   const [isCheckingSession, setIsCheckingSession] = useState(true);
@@ -25,8 +26,16 @@ export default function AdminMembersPage() {
   const [image, setImage] = useState<File | null>(null);
   const [fileInputKey, setFileInputKey] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [memberListRefresh, setMemberListRefresh] = useState(0);
   const [feedback, setFeedback] = useState("");
   const [hasError, setHasError] = useState(false);
+
+  const handleSessionExpired = useCallback(() => {
+    setIsAuthenticated(false);
+    setAdminUsername("");
+    setFeedback("Your admin session expired. Please sign in again.");
+    setHasError(true);
+  }, []);
 
   useEffect(() => {
     getAdminSession()
@@ -80,6 +89,7 @@ export default function AdminMembersPage() {
         preferred_position: preferredPosition,
         image,
       });
+      setMemberListRefresh((current) => current + 1);
       setFeedback(`Added ${member.name} with membership ID ${member.membership_id}.`);
       setName("");
       setEmail("");
@@ -130,7 +140,7 @@ export default function AdminMembersPage() {
   return (
     <>
       <Navbar />
-      <main className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
+      <main className="mx-auto max-w-5xl px-6 py-16 sm:py-20">
         <p className="text-[11px] font-extrabold tracking-[.16em] text-[#075aa6]">
           CLUB ADMINISTRATION
         </p>
@@ -168,6 +178,12 @@ export default function AdminMembersPage() {
                   >
                     MANAGE NEWS
                   </Link>
+                  <Link
+                    href="/admin/metrics"
+                    className="w-fit border border-slate-200 px-4 py-3 text-xs font-extrabold text-[#075aa6]"
+                  >
+                    VIEW METRICS
+                  </Link>
                   <button
                     type="button"
                     onClick={handleLogout}
@@ -179,7 +195,7 @@ export default function AdminMembersPage() {
                 </div>
               </div>
 
-              <form onSubmit={handleCreateMember} className="mt-7 grid gap-5">
+              <form onSubmit={handleCreateMember} className="mt-7 grid max-w-2xl gap-5">
                 <label>
                   <span className="text-[10px] font-extrabold tracking-wider text-[#071b33]">
                     FULL NAME
@@ -349,6 +365,13 @@ export default function AdminMembersPage() {
             </>
           )}
         </section>
+
+        {!isCheckingSession && isAuthenticated && (
+          <AdminMemberManager
+            refreshToken={memberListRefresh}
+            onSessionExpired={handleSessionExpired}
+          />
+        )}
 
         <Link
           href="/members"

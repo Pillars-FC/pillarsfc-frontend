@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import "./globals.css";
+import AnalyticsTracker from "./components/AnalyticsTracker";
 import Footer from "./components/Footer";
 
 const condensed = Barlow_Condensed({
@@ -23,6 +25,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body
         className={`${condensed.variable} ${sans.variable} bg-[#f7f8fa] font-sans text-[#101d2c] flex min-h-screen flex-col`}
       >
+        <Suspense fallback={null}>
+          <AnalyticsTracker />
+        </Suspense>
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

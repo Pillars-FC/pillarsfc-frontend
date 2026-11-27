@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { Crest } from "./Navbar";
 import { subscribeToClubEvents } from "../lib/event-subscriptions";
+import { openAnalyticsPreferences } from "../lib/analytics";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -148,6 +149,13 @@ export default function Footer() {
         <div className="flex gap-5">
           <a href="#">Privacy</a>
           <a href="#">Terms</a>
+          <button
+            type="button"
+            onClick={openAnalyticsPreferences}
+            className="text-left hover:text-white"
+          >
+            Analytics preferences
+          </button>
           <Link href="/contact">Support</Link>
         </div>
       </div>

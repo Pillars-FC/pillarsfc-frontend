@@ -1,8 +1,9 @@
 "use client";
 
 import axios from "axios";
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import Navbar from "../components/Navbar";
+import { recordAnalyticsEvent } from "../lib/analytics";
 import { submitMemberApplication } from "../lib/applications";
 import type { PreferredPosition } from "../lib/members";
 
@@ -16,6 +17,7 @@ const positions: PreferredPosition[] = [
 ];
 
 export default function JoinPage() {
+  const hasTrackedStart = useRef(false);
   const [photoName, setPhotoName] = useState("");
   const [photoError, setPhotoError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -54,6 +56,10 @@ export default function JoinPage() {
     setHasError(false);
     try {
       const application = await submitMemberApplication(formData);
+      recordAnalyticsEvent({
+        event: "application_submitted",
+        path: "/join",
+      });
       form.reset();
       setPhotoName("");
       setFeedback(
@@ -95,6 +101,14 @@ export default function JoinPage() {
           </p>
           <form
             onSubmit={handleSubmit}
+            onFocusCapture={() => {
+              if (hasTrackedStart.current) return;
+              hasTrackedStart.current = true;
+              recordAnalyticsEvent({
+                event: "application_started",
+                path: "/join",
+              });
+            }}
             className="mt-10 bg-white p-7 shadow-[0_6px_26px_rgba(13,35,50,.06)] sm:p-10"
           >
             <h2 className="font-condensed text-3xl font-extrabold uppercase text-[#071b33]">

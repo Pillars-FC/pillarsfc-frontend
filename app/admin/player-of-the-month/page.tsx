@@ -161,6 +161,12 @@ export default function AdminPlayerOfTheMonthPage() {
             >
               VIEW PUBLIC PAGE
             </Link>
+            <Link
+              href="/admin/metrics"
+              className="w-fit border border-slate-200 px-4 py-3 text-xs font-extrabold text-[#075aa6]"
+            >
+              VIEW METRICS
+            </Link>
             {isAuthenticated && (
               <button
                 type="button"

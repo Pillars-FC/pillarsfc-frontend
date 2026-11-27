@@ -35,6 +35,11 @@ interface NewsCreatedResponse {
   data: NewsArticle;
 }
 
+interface NewsUpdatedResponse {
+  status: "success";
+  data: NewsArticle;
+}
+
 export async function getNews(
   params: { skip: number; limit: number },
   signal?: AbortSignal,
@@ -79,4 +84,46 @@ export async function createNewsArticle(
     timeout: 90_000,
   });
   return response.data.data;
+}
+
+export interface NewsUpdateInput {
+  title: string;
+  category: string;
+  summary: string;
+  content: string;
+  coverImage: File | null;
+  gallery: File[];
+  removeGalleryUrls: string[];
+}
+
+export async function updateNewsArticle(
+  slug: string,
+  article: NewsUpdateInput,
+): Promise<NewsArticle> {
+  const formData = new FormData();
+  formData.append("title", article.title);
+  formData.append("category", article.category);
+  formData.append("summary", article.summary);
+  formData.append("content", article.content);
+  if (article.coverImage) formData.append("cover_image", article.coverImage);
+  article.gallery.forEach((image) => formData.append("gallery", image));
+  article.removeGalleryUrls.forEach((url) =>
+    formData.append("remove_gallery_urls", url),
+  );
+
+  const response = await api.patch<NewsUpdatedResponse>(
+    `/admin/news/${encodeURIComponent(slug)}`,
+    formData,
+    {
+      withCredentials: true,
+      timeout: 90_000,
+    },
+  );
+  return response.data.data;
+}
+
+export async function deleteNewsArticle(slug: string): Promise<void> {
+  await api.delete(`/admin/news/${encodeURIComponent(slug)}`, {
+    withCredentials: true,
+  });
 }
